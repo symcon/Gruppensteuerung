@@ -1,0 +1,12 @@
+{
+    "id": "{F197064F-791F-0964-2B8E-563136E9B7B4}",
+    "name": "Gruppensteuerung",
+    "type": 3,
+    "vendor": "",
+    "aliases": [],
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "GS",
+    "url": "https://github.com/symcon/Gruppensteuerung"
+}
