@@ -1,7 +1,11 @@
 {
     "translations": {
         "de": {
-            "Variables": "Variablen"
+            "Variables": "Variablen",
+            "The list is empty.": "Die Liste ist leer.",
+            "Not all variables are of the same type.": "Nicht alle Variablen sind vom gleichen Typ.",
+            "Not all variables use the same profile.": "Nicht alle Variablen nutzen das gleiche Profil.",
+            "Not all variables have an action.": "Nicht alle Variablen haben eine Aktion."
         }
     }
 }
