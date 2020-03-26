@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
     class Gruppensteuerung extends IPSModule
     {
         public function Create()
@@ -24,7 +26,7 @@
             parent::ApplyChanges();
 
             $variables = json_decode($this->ReadPropertyString('Variables'), true);
-            
+
             if (count($variables) <= 0) {
                 $this->SetStatus(104);
                 return;
@@ -67,7 +69,7 @@
             foreach ($this->GetReferenceList() as $referenceID) {
                 $this->UnregisterReference($referenceID);
             }
-            
+
             foreach ($variables as $variable) {
                 $this->RegisterReference($variable['VariableID']);
             }
@@ -93,7 +95,7 @@
                     break;
             }
             $this->EnableAction('Status');
-            
+
             //Register message
             $messageList = array_keys($this->GetMessageList());
             foreach ($messageList as $message) {
@@ -104,7 +106,7 @@
             }
             $this->SendDebug('MessageList', json_encode($this->GetMessageList()), 0);
         }
-        
+
         public function MessageSink($Timestamp, $SenderID, $MessageID, $Data)
         {
             $this->SendDebug('MessageSink', IPS_GetName($SenderID), 0);
