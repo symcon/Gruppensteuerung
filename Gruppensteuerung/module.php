@@ -76,6 +76,7 @@ declare(strict_types=1);
 
             $this->SetStatus(102);
 
+            //Register variable of needed type with correct profile
             $statusVariableReferenceID = $variables[0]['VariableID'];
             $variableType = IPS_GetVariable($statusVariableReferenceID)['VariableType'];
             $variableProfile = IPS_GetVariable($statusVariableReferenceID)['VariableCustomProfile'];
@@ -96,7 +97,7 @@ declare(strict_types=1);
             }
             $this->EnableAction('Status');
 
-            //Register message
+            //Register messages
             $messageList = array_keys($this->GetMessageList());
             foreach ($messageList as $message) {
                 $this->UnregisterMessage($message, VM_UPDATE);
@@ -104,7 +105,6 @@ declare(strict_types=1);
             foreach ($variables as $variable) {
                 $this->RegisterMessage($variable['VariableID'], VM_UPDATE);
             }
-            $this->SendDebug('MessageList', json_encode($this->GetMessageList()), 0);
         }
 
         public function MessageSink($Timestamp, $SenderID, $MessageID, $Data)
