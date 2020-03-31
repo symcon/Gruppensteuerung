@@ -13,7 +13,8 @@ Beschreibung des Moduls.
 
 ### 1. Funktionsumfang
 
-*
+* Wenn eine Variable in der Gruppe geschaltet wird, werden alle verbleibenden in der Gruppe ebenso geschaltet
+* Alle Variablen, welche einer Liste hinzugefügt werden können mit einer seperaten Variable gleichzeitig geschlatet werden
 
 ### 2. Vorraussetzungen
 
@@ -22,7 +23,7 @@ Beschreibung des Moduls.
 ### 3. Software-Installation
 
 * Über den Module Store das 'Gruppensteuerung'-Modul installieren.
-* Alternativ über das Module Control folgende URL hinzufügen
+* Alternativ über das Module Control folgende URL hinzufügen: `https://github.com/symcon/Gruppensteuerung`
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
@@ -30,10 +31,9 @@ Beschreibung des Moduls.
 
 __Konfigurationsseite__:
 
-Name     | Beschreibung
--------- | ------------------
-         |
-         |
+Name      | Beschreibung
+--------- | ------------------
+Variablen | Die in dieser Liste vorhandenen Variablen gehören zu der Gruppe; Alle Variablen müssen vom gleichen Typ sein und das gleiche Profil haben sowie eine Aktion 
 
 ### 5. Statusvariablen und Profile
 
@@ -43,24 +43,16 @@ Die Statusvariablen/Kategorien werden automatisch angelegt. Das Löschen einzeln
 
 Name   | Typ     | Beschreibung
 ------ | ------- | ------------
-       |         |
-       |         |
+Status |variant  | Zeigt den Status der aktuellen Gruppe an
 
 #### Profile
 
-Name   | Typ
------- | -------
-       |
-       |
+Es werden keine zusätzlichen Profile hinzugefügt.
 
 ### 6. WebFront
 
-Die Funktionalität, die das Modul im WebFront bietet.
+Hier wird die Statusvariable angezeigt, welche die Gruppe schalten kann.
 
 ### 7. PHP-Befehlsreferenze
 
-`boolean GS_BeispielFunktion(integer $InstanzID);`
-Erklärung der Funktion.
-
-Beispiel:
-`GS_BeispielFunktion(12345);`
+Es werden keine zusätzlichen Funktionen hinzugefügt.
