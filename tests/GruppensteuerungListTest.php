@@ -30,7 +30,7 @@ class GruppensteuerungListTest extends TestCase
     {
         $instanceID = IPS_CreateInstance('{F197064F-791F-0964-2B8E-563136E9B7B4}');
         IPS_ApplyChanges($instanceID);
-        $this->assertEquals(104, IPS\InstanceManager::getStatus($instanceID));
+        $this->assertEquals(104, IPS_GetInstance($instanceID)['InstanceStatus']);
     }
 
     public function testDifferentVariables()
@@ -57,7 +57,7 @@ class GruppensteuerungListTest extends TestCase
 
         IPS_ApplyChanges($instanceID);
         $this->assertTrue(true);
-        $this->assertEquals(200, IPS\InstanceManager::getStatus($instanceID));
+        $this->assertEquals(200, IPS_GetInstance($instanceID)['InstanceStatus']);
     }
 
     public function testNormalList()
@@ -83,7 +83,7 @@ class GruppensteuerungListTest extends TestCase
         ]));
 
         IPS_ApplyChanges($instanceID);
-        $this->assertEquals(102, IPS\InstanceManager::getStatus($instanceID));
+        $this->assertEquals(102, IPS_GetInstance($instanceID)['InstanceStatus']);
     }
 
     private function addAction(int $variableID)
