@@ -6,5 +6,5 @@
 
 Folgende Module beinhaltet das Gruppensteuerung Repository:
 
-- __Gruppensteuerung__ ([Dokumentation](Gruppensteuerung))
-	Kurze Beschreibung des Moduls.
+- __Gruppensteuerung__ ([Dokumentation](Gruppensteuerung))  
+	Mithilfe der Gruppensteuerungen können Variablen in Gruppen zusammen geschaltet werden.
