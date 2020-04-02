@@ -11,7 +11,6 @@ declare(strict_types=1);
 
             //Properties
             $this->RegisterPropertyString('Variables', '[]');
-            $this->RegisterAttributeString('UpdateValue', '');
         }
 
         public function Destroy()
