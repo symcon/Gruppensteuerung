@@ -1,5 +1,5 @@
 # Gruppensteuerung
-Beschreibung des Moduls.
+Mithilfe der Gruppensteuerungen können Variablen in Gruppen zusammen geschaltet werden.
 
 ### Inhaltsverzeichnis
 
