@@ -120,7 +120,6 @@ declare(strict_types=1);
         public function MessageSink($Timestamp, $SenderID, $MessageID, $Data)
         {
             $this->SendDebug('MessageSink', IPS_GetName($SenderID), 0);
-            SetValue($this->GetIDForIdent('Status'), $Data[0]);
             $this->SwitchGroup($Data[0], $SenderID);
         }
 
@@ -128,7 +127,6 @@ declare(strict_types=1);
         {
             switch ($Ident) {
                 case 'Status':
-                    $this->SetValue($Ident, $Value);
                     $this->SwitchGroup($Value, $this->GetIDForIdent('Status'));
                     break;
                 default:
@@ -155,6 +153,7 @@ declare(strict_types=1);
         private function SwitchGroup($value, $sender)
         {
             if ($this->GetStatus() == 102) {
+                SetValue($this->GetIDForIdent('Status'), $value);
                 $variables = json_decode($this->ReadPropertyString('Variables'), true);
                 $this->SendDebug('SingleVariable', json_encode($variables), 0);
 
