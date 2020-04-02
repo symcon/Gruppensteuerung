@@ -38,6 +38,7 @@ class GruppensteuerungFunctionalityTest extends TestCase
         $this->addAction($integer2);
 
         IPS_SetConfiguration($instanceID, json_encode([
+            'Active'    => true,
             'Variables' => json_encode([
                 [
                     'VariableID' => $integer1

@@ -45,6 +45,7 @@ class GruppensteuerungListTest extends TestCase
 
         $this->assertTrue(true);
         IPS_SetConfiguration($instanceID, json_encode([
+            'Active'    => true,
             'Variables' => json_encode([
                 [
                     'VariableID' => $boolean1
@@ -72,6 +73,7 @@ class GruppensteuerungListTest extends TestCase
 
         $this->assertTrue(true);
         IPS_SetConfiguration($instanceID, json_encode([
+            'Active'    => true,
             'Variables' => json_encode([
                 [
                     'VariableID' => $boolean1

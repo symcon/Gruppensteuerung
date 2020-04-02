@@ -1,6 +1,11 @@
 {
     "elements": [
         {
+            "type": "CheckBox",
+            "caption": "Active",
+            "name": "Active"
+        },
+        {
             "type": "List",
             "caption": "Variables",
             "name": "Variables",
@@ -19,9 +24,35 @@
         }
     ],
     "status": [
-        {"code": 104, "caption": "The list is empty.", "icon": "error"},
-        {"code": 200, "caption": "Not all variables are of the same type.", "icon": "error"},
-        {"code": 201, "caption": "Not all variables use same profile.", "icon": "error"},
-        {"code": 202, "caption": "Not all variables have an action.", "icon": "error"}
+        {
+            "code": 104,
+            "caption": "The instance is inactive.",
+            "icon": "inactive"
+        },
+        {
+            "code": 200,
+            "caption": "Not all variables are of the same type.",
+            "icon": "error"
+        },
+        {
+            "code": 201,
+            "caption": "Not all variables use same profile.",
+            "icon": "error"
+        },
+        {
+            "code": 202,
+            "caption": "Not all variables have an action.",
+            "icon": "error"
+        },
+        {
+            "code": 203,
+            "caption": "Not all variables exist.",
+            "icon": "error"
+        },
+        {
+            "code": 204,
+            "caption": "The list is empty.",
+            "icon": "error"
+        }
     ]
 }

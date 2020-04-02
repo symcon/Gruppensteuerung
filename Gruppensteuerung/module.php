@@ -10,6 +10,7 @@ declare(strict_types=1);
             parent::Create();
 
             //Properties
+            $this->RegisterPropertyBoolean('Active', false);
             $this->RegisterPropertyString('Variables', '[]');
         }
 
