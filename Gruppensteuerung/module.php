@@ -95,7 +95,7 @@ declare(strict_types=1);
             $variableProfile = $referenceVariable['VariableCustomProfile'];
             $statusVariableID = @$this->GetIDForIdent('Status');
             if (!$statusVariableID) {
-            } elseif (IPS_VariableExists($statusVariableID) && ($referenceType != IPS_GetVariable($statusVariable)['VariableType'])) {
+            } elseif (IPS_VariableExists($statusVariableID) && ($referenceType != IPS_GetVariable($statusVariableID)['VariableType'])) {
                 $this->UnregisterVariable('Status');
             } else {
                 return;
