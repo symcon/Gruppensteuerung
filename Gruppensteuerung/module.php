@@ -27,9 +27,21 @@ declare(strict_types=1);
 
             $variables = json_decode($this->ReadPropertyString('Variables'), true);
 
-            if (count($variables) <= 0) {
+            if (!$this->ReadPropertyBoolean('Active')) {
                 $this->SetStatus(104);
                 return;
+            }
+
+            if (count($variables) <= 0) {
+                $this->SetStatus(204);
+            }
+            //Register references
+            foreach ($this->GetReferenceList() as $referenceID) {
+                $this->UnregisterReference($referenceID);
+            }
+
+            foreach ($variables as $variable) {
+                $this->RegisterReference($variable['VariableID']);
             }
 
             //Check if all variables are the same type
@@ -46,15 +58,9 @@ declare(strict_types=1);
             }
 
             //Check if all variables have the same profile
-            $referenceCustomProfile = $referenceVariable['VariableCustomProfile'];
-            $referenceProfile = $referenceVariable['VariableProfile'];
             foreach ($variables as $variable) {
-                $variableData = IPS_GetVariable($variable['VariableID']);
-                $customProfile = $variableData['VariableCustomProfile'];
-                $profile = $variableData['VariableProfile'];
-                if (($referenceCustomProfile != $customProfile) || ($referenceProfile != $profile)) {
+                if (!$this->sameProfile($variable['VariableID'])) {
                     $this->SetStatus(201);
-                    return;
                 }
             }
 
@@ -65,23 +71,36 @@ declare(strict_types=1);
                     return;
                 }
             }
-            //Register references
-            foreach ($this->GetReferenceList() as $referenceID) {
-                $this->UnregisterReference($referenceID);
+
+            //Check if all variables exist
+            foreach ($variables as $variable) {
+                if (!IPS_VariableExists($variable['VariableID'])) {
+                    $this->SetStatus(203);
+                    return;
+                }
             }
 
+            //Register messages
+            $messageList = array_keys($this->GetMessageList());
+            foreach ($messageList as $message) {
+                $this->UnregisterMessage($message, VM_UPDATE);
+            }
             foreach ($variables as $variable) {
-                $this->RegisterReference($variable['VariableID']);
+                $this->RegisterMessage($variable['VariableID'], VM_UPDATE);
             }
 
             $this->SetStatus(102);
 
             //Register variable of needed type with correct profile
-            $statusVariableReferenceID = $variables[0]['VariableID'];
-            $variableType = IPS_GetVariable($statusVariableReferenceID)['VariableType'];
-            $variableProfile = IPS_GetVariable($statusVariableReferenceID)['VariableCustomProfile'];
-            $this->UnregisterVariable('Status');
-            switch ($variableType) {
+            $variableProfile = $referenceVariable['VariableCustomProfile'];
+            $statusVariableID = @$this->GetIDForIdent('Status');
+            if (!$statusVariableID) {
+            } elseif (IPS_VariableExists($statusVariableID) && ($referenceType != IPS_GetVariable($statusVariable)['VariableType'])) {
+                $this->UnregisterVariable('Status');
+            } else {
+                return;
+            }
+            switch ($referenceType) {
                 case 0:
                     $this->RegisterVariableBoolean('Status', 'Status', $variableProfile, 0);
                     break;
@@ -96,15 +115,6 @@ declare(strict_types=1);
                     break;
             }
             $this->EnableAction('Status');
-
-            //Register messages
-            $messageList = array_keys($this->GetMessageList());
-            foreach ($messageList as $message) {
-                $this->UnregisterMessage($message, VM_UPDATE);
-            }
-            foreach ($variables as $variable) {
-                $this->RegisterMessage($variable['VariableID'], VM_UPDATE);
-            }
         }
 
         public function MessageSink($Timestamp, $SenderID, $MessageID, $Data)
@@ -118,13 +128,28 @@ declare(strict_types=1);
         {
             switch ($Ident) {
                 case 'Status':
-                    $this->SendDebug('Status', 'triggered', 0);
                     $this->SetValue($Ident, $Value);
                     $this->SwitchGroup($Value, $this->GetIDForIdent('Status'));
                     break;
                 default:
                     throw new Exception('InvalidIdent');
             }
+        }
+
+        private function sameProfile($variableID)
+        {
+            $referenceVariable = json_decode($this->ReadPropertyString('Variables'), true)[0]['VariableID'];
+            $referenceVariableData = IPS_GetVariable($referenceVariable);
+            $referenceCustomProfile = $referenceVariableData['VariableCustomProfile'];
+            $referenceProfile = $referenceVariableData['VariableProfile'];
+            $variableData = IPS_GetVariable($variableID);
+            $customProfile = $variableData['VariableCustomProfile'];
+            $profile = $variableData['VariableProfile'];
+            if (($referenceCustomProfile == $customProfile || $referenceCustomProfile == $profile) ||
+                ($referenceProfile == $referenceCustomProfile || $referenceProfile == $profile)) {
+                return false;
+            }
+            return true;
         }
 
         private function SwitchGroup($value, $sender)
