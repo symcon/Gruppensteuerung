@@ -150,7 +150,7 @@ declare(strict_types=1);
             return true;
         }
 
-        private function SwitchGroup($value, $sender)
+        private function SwitchGroup($value)
         {
             if ($this->GetStatus() == 102) {
                 SetValue($this->GetIDForIdent('Status'), $value);
@@ -158,7 +158,7 @@ declare(strict_types=1);
                 $this->SendDebug('SingleVariable', json_encode($variables), 0);
 
                 foreach ($variables as $variable) {
-                    if ($variable['VariableID'] != $sender && GetValue($variable['VariableID']) != $value && HasAction($variable['VariableID'])) {
+                    if (GetValue($variable['VariableID']) != $value && HasAction($variable['VariableID'])) {
                         RequestAction($variable['VariableID'], $value);
                     } elseif (!HasAction($variable['VariableID'])) {
                         throw new Exception('One variable has no action.');
