@@ -160,6 +160,8 @@ declare(strict_types=1);
                 foreach ($variables as $variable) {
                     if ($variable['VariableID'] != $sender && GetValue($variable['VariableID']) != $value && HasAction($variable['VariableID'])) {
                         RequestAction($variable['VariableID'], $value);
+                    } elseif (!HasAction($variable['VariableID'])) {
+                        throw new Exception('One variable has no action.');
                     }
                 }
             }
