@@ -134,17 +134,19 @@ declare(strict_types=1);
             $referenceVariableID = $variables[0]['VariableID'];
 
             //Same type
+            $referenceType = $this->getType($referenceVariableID);
             if (count($variables) > 1) {
                 foreach ($variables as $variable) {
-                    if (($this->getType($referenceVariableID) != $this->getType($variable['VariableID']))) {
+                    if ($this->getType($variable['VariableID']) != $referenceType) {
                         return 200;
                     }
                 }
             }
 
             //Same profile
+            $referenceProfile = $this->getProfile($referenceVariableID);
             foreach ($variables as $variable) {
-                if ($this->getProfile($variable['VariableID']) != $this->getProfile($referenceVariableID)) {
+                if ($this->getProfile($variable['VariableID']) != $referenceProfile) {
                     return 201;
                 }
             }
