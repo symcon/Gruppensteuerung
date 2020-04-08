@@ -53,13 +53,13 @@ declare(strict_types=1);
             }
 
             //Register variable of needed type with correct profile
-            $variableProfile = $referenceVariable['VariableCustomProfile'];
+            $referenceID = $variables[0]['VariableID'];
+            $variableProfile = $this->getProfile($referenceID);
             $statusVariableID = @$this->GetIDForIdent('Status');
-            if (!$statusVariableID) {
-            } elseif (IPS_VariableExists($statusVariableID) && ($referenceType != IPS_GetVariable($statusVariableID)['VariableType'])) {
+            $referenceType = $this->getType($referenceID);
+            //StatusVariableID could be false. In order to prevent false beeing used in VariableExist we use intval() and convert it to 0
+            if (IPS_VariableExists(intval($statusVariableID)) && ($referenceType != $this->getType($statusVariableID))) {
                 $this->UnregisterVariable('Status');
-            } else {
-                return;
             }
             switch ($referenceType) {
                 case 0:
