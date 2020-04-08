@@ -95,20 +95,21 @@ declare(strict_types=1);
             }
         }
 
-        private function sameProfile($variableID)
+        private function getProfile($variableID)
         {
-            $referenceVariable = json_decode($this->ReadPropertyString('Variables'), true)[0]['VariableID'];
-            $referenceVariableData = IPS_GetVariable($referenceVariable);
-            $referenceCustomProfile = $referenceVariableData['VariableCustomProfile'];
-            $referenceProfile = $referenceVariableData['VariableProfile'];
             $variableData = IPS_GetVariable($variableID);
-            $customProfile = $variableData['VariableCustomProfile'];
-            $profile = $variableData['VariableProfile'];
-            if (($referenceCustomProfile == $customProfile || $referenceCustomProfile == $profile) ||
-                ($referenceProfile == $referenceCustomProfile || $referenceProfile == $profile)) {
-                return false;
+            if ($variableData['VariableCustomProfile'] == '') {
+                return $variableData['VariableProfile'];
+            } else {
+                return $variableData['VariableCustomProfile'];
             }
-            return true;
+        }
+
+        private function getType($variableID)
+        {
+            return IPS_GetVariable($variableID)['VariableType'];
+        }
+
         private function computeStatus()
         {
             //Active
