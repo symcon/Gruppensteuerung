@@ -153,15 +153,16 @@ declare(strict_types=1);
         private function SwitchGroup($value)
         {
             if ($this->GetStatus() == 102) {
-                SetValue($this->GetIDForIdent('Status'), $value);
-                $variables = json_decode($this->ReadPropertyString('Variables'), true);
-                $this->SendDebug('SingleVariable', json_encode($variables), 0);
+                if ($value != $this->GetValue('Status')) {
+                    $this->SetValue('Status', $value);
+                    $variables = json_decode($this->ReadPropertyString('Variables'), true);
 
-                foreach ($variables as $variable) {
-                    if (GetValue($variable['VariableID']) != $value && HasAction($variable['VariableID'])) {
-                        RequestAction($variable['VariableID'], $value);
-                    } elseif (!HasAction($variable['VariableID'])) {
-                        throw new Exception('One variable has no action.');
+                    foreach ($variables as $variable) {
+                        if (GetValue($variable['VariableID']) != $value && HasAction($variable['VariableID'])) {
+                            RequestAction($variable['VariableID'], $value);
+                        } elseif (!HasAction($variable['VariableID'])) {
+                            throw new Exception('One variable has no action.');
+                        }
                     }
                 }
             }
