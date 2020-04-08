@@ -163,6 +163,9 @@ declare(strict_types=1);
         private function SwitchGroup($value)
         {
             $computedStatus = $this->computeStatus();
+            if ($computedStatus != $this->GetStatus()) {
+                $this->SetStatus($computedStatus);
+            }
             if (($computedStatus == 102) && ($value != $this->GetValue('Status'))) {
                 $this->SetValue('Status', $value);
                 $variables = json_decode($this->ReadPropertyString('Variables'), true);
@@ -174,8 +177,6 @@ declare(strict_types=1);
                         throw new Exception('One variable has no action.');
                     }
                 }
-            } elseif ($computedStatus != 102) {
-                $this->SetStatus($computedStatus);
             }
         }
     }
