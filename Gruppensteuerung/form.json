@@ -16,6 +16,7 @@
                     "caption": "Variable",
                     "name": "VariableID",
                     "add": 0,
+                    "width": "auto",
                     "edit": {
                         "type": "SelectVariable"
                     }
