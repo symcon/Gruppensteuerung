@@ -135,11 +135,9 @@ declare(strict_types=1);
 
             //Same type
             $referenceType = $this->getType($referenceVariableID);
-            if (count($variables) > 1) {
-                foreach ($variables as $variable) {
-                    if ($this->getType($variable['VariableID']) != $referenceType) {
-                        return 200;
-                    }
+            foreach ($variables as $variable) {
+                if ($this->getType($variable['VariableID']) != $referenceType) {
+                    return 200;
                 }
             }
 
