@@ -118,7 +118,6 @@ declare(strict_types=1);
             }
 
             $variables = json_decode($this->ReadPropertyString('Variables'), true);
-            $referenceVariableID = $variables[0]['VariableID'];
 
             //List empty
             if (count($variables) <= 0) {
@@ -131,6 +130,8 @@ declare(strict_types=1);
                     return 203;
                 }
             }
+            //ReferenceVariable
+            $referenceVariableID = $variables[0]['VariableID'];
 
             //Same type
             if (count($variables) > 1) {
