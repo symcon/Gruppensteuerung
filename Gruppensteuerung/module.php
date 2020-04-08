@@ -120,14 +120,14 @@ declare(strict_types=1);
         public function MessageSink($Timestamp, $SenderID, $MessageID, $Data)
         {
             $this->SendDebug('MessageSink', IPS_GetName($SenderID), 0);
-            $this->SwitchGroup($Data[0], $SenderID);
+            $this->SwitchGroup($Data[0]);
         }
 
         public function RequestAction($Ident, $Value)
         {
             switch ($Ident) {
                 case 'Status':
-                    $this->SwitchGroup($Value, $this->GetIDForIdent('Status'));
+                    $this->SwitchGroup($Value);
                     break;
                 default:
                     throw new Exception('InvalidIdent');
