@@ -36,10 +36,9 @@ declare(strict_types=1);
                 $this->RegisterReference($variable['VariableID']);
             }
 
-            $computedStatus = $this->computeStatus();
-            $this->SetStatus($computedStatus);
+            $instanceStatus = $this->setCurrentStatus();
             //Return if instance has issues
-            if ($computedStatus != 102) {
+            if ($instanceStatus != 102) {
                 return;
             }
 
@@ -61,20 +60,7 @@ declare(strict_types=1);
             if (IPS_VariableExists(intval($statusVariableID)) && ($referenceType != $this->getType($statusVariableID))) {
                 $this->UnregisterVariable('Status');
             }
-            switch ($referenceType) {
-                case 0:
-                    $this->RegisterVariableBoolean('Status', 'Status', $variableProfile, 0);
-                    break;
-                case 1:
-                    $this->RegisterVariableInteger('Status', 'Status', $variableProfile, 0);
-                    break;
-                case 2:
-                    $this->RegisterVariableFloat('Status', 'Status', $variableProfile, 0);
-                    break;
-                case 3:
-                    $this->RegisterVariableString('Status', 'Status', $variableProfile, 0);
-                    break;
-            }
+            $this->registerStatusVariable($referenceType, $variableProfile);
             $this->EnableAction('Status');
         }
 
@@ -110,10 +96,11 @@ declare(strict_types=1);
             return IPS_GetVariable($variableID)['VariableType'];
         }
 
-        private function computeStatus()
+        private function setCurrentStatus()
         {
             //Active
             if (!$this->ReadPropertyBoolean('Active')) {
+                $this->SetStatus(104);
                 return 104;
             }
 
@@ -121,12 +108,14 @@ declare(strict_types=1);
 
             //List empty
             if (count($variables) <= 0) {
+                $this->SetStatus(204);
                 return 204;
             }
 
             //Exist
             foreach ($variables as $variable) {
                 if (!IPS_VariableExists($variable['VariableID'])) {
+                    $this->SetStatus(203);
                     return 203;
                 }
             }
@@ -137,6 +126,7 @@ declare(strict_types=1);
             $referenceType = $this->getType($referenceVariableID);
             foreach ($variables as $variable) {
                 if ($this->getType($variable['VariableID']) != $referenceType) {
+                    $this->SetStatus(200);
                     return 200;
                 }
             }
@@ -145,28 +135,50 @@ declare(strict_types=1);
             $referenceProfile = $this->getProfile($referenceVariableID);
             foreach ($variables as $variable) {
                 if ($this->getProfile($variable['VariableID']) != $referenceProfile) {
+                    $this->SetStatus(201);
                     return 201;
                 }
+            }
+            //Update profile of status if necessary
+            if (@$this->GetIDForIdent('Status') && ($referenceProfile != $this->getProfile($this->GetIDForIdent('Status')))) {
+                $this->registerStatusVariable($referenceType, $referenceProfile);
             }
 
             //Have action
             foreach ($variables as $variable) {
                 if (!HasAction($variable['VariableID'])) {
+                    $this->SetStatus(202);
                     return 202;
                 }
             }
 
             //Everything ok
+            $this->SetStatus(102);
             return 102;
+        }
+
+        private function registerStatusVariable($type, $profile)
+        {
+            switch ($type) {
+                case 0:
+                    $this->RegisterVariableBoolean('Status', 'Status', $profile, 0);
+                    break;
+                case 1:
+                    $this->RegisterVariableInteger('Status', 'Status', $profile, 0);
+                    break;
+                case 2:
+                    $this->RegisterVariableFloat('Status', 'Status', $profile, 0);
+                    break;
+                case 3:
+                    $this->RegisterVariableString('Status', 'Status', $profile, 0);
+                    break;
+            }
         }
 
         private function SwitchGroup($value)
         {
-            $computedStatus = $this->computeStatus();
-            if ($computedStatus != $this->GetStatus()) {
-                $this->SetStatus($computedStatus);
-            }
-            if (($computedStatus == 102) && ($value != $this->GetValue('Status'))) {
+            $instanceStatus = $this->setCurrentStatus();
+            if (($instanceStatus == 102) && ($value != $this->GetValue('Status'))) {
                 $this->SetValue('Status', $value);
                 $variables = json_decode($this->ReadPropertyString('Variables'), true);
 
@@ -177,6 +189,13 @@ declare(strict_types=1);
                         throw new Exception('One variable has no action.');
                     }
                 }
+            } elseif ($instanceStatus != 102) {
+                $statuscodes = [];
+                $statusForm = json_decode(IPS_GetConfigurationForm($this->InstanceID), true)['status'];
+                foreach ($statusForm as $status) {
+                    $statuscodes[$status['code']] = $status['caption'];
+                }
+                $this->LogMessage($this->Translate($statuscodes[$instanceStatus]), KL_ERROR);
             }
         }
     }
