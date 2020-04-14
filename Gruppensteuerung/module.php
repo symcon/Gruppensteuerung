@@ -36,9 +36,8 @@ declare(strict_types=1);
                 $this->RegisterReference($variable['VariableID']);
             }
 
-            $instanceStatus = $this->setCurrentStatus();
-            //Return if instance has issues
-            if ($instanceStatus != 102) {
+            $status = $this->initializeStatus();
+            if ($status != 102) {
                 return;
             }
 
@@ -50,18 +49,6 @@ declare(strict_types=1);
             foreach ($variables as $variable) {
                 $this->RegisterMessage($variable['VariableID'], VM_UPDATE);
             }
-
-            //Register variable of needed type with correct profile
-            $referenceID = $variables[0]['VariableID'];
-            $variableProfile = $this->getProfile($referenceID);
-            $statusVariableID = @$this->GetIDForIdent('Status');
-            $referenceType = $this->getType($referenceID);
-            //StatusVariableID could be false. In order to prevent false beeing used in VariableExist we use intval() and convert it to 0
-            if (IPS_VariableExists(intval($statusVariableID)) && ($referenceType != $this->getType($statusVariableID))) {
-                $this->UnregisterVariable('Status');
-            }
-            $this->registerStatusVariable($referenceType, $variableProfile);
-            $this->EnableAction('Status');
         }
 
         public function MessageSink($Timestamp, $SenderID, $MessageID, $Data)
@@ -96,7 +83,7 @@ declare(strict_types=1);
             return IPS_GetVariable($variableID)['VariableType'];
         }
 
-        private function setCurrentStatus()
+        private function initializeStatus()
         {
             //Active
             if (!$this->ReadPropertyBoolean('Active')) {
@@ -121,9 +108,10 @@ declare(strict_types=1);
             }
             //ReferenceVariable
             $referenceVariableID = $variables[0]['VariableID'];
+            $referenceType = $this->getType($referenceVariableID);
+            $referenceProfile = $this->getProfile($referenceVariableID);
 
             //Same type
-            $referenceType = $this->getType($referenceVariableID);
             foreach ($variables as $variable) {
                 if ($this->getType($variable['VariableID']) != $referenceType) {
                     $this->SetStatus(200);
@@ -132,17 +120,35 @@ declare(strict_types=1);
             }
 
             //Same profile
-            $referenceProfile = $this->getProfile($referenceVariableID);
             foreach ($variables as $variable) {
                 if ($this->getProfile($variable['VariableID']) != $referenceProfile) {
                     $this->SetStatus(201);
                     return 201;
                 }
             }
-            //Update profile of status if necessary
-            if (@$this->GetIDForIdent('Status') && ($referenceProfile != $this->getProfile($this->GetIDForIdent('Status')))) {
-                $this->registerStatusVariable($referenceType, $referenceProfile);
+
+            //Register variable of needed type with correct profile
+            $statusVariableID = @$this->GetIDForIdent('Status');
+            //StatusVariableID could be false. In order to prevent false beeing used in VariableExist we use intval() and convert it to 0
+            if (IPS_VariableExists(intval($statusVariableID)) && ($referenceType != $this->getType($statusVariableID))) {
+                $this->UnregisterVariable('Status');
             }
+            //Update profile of status if necessary
+            switch ($referenceType) {
+                case 0:
+                    $this->RegisterVariableBoolean('Status', 'Status', $referenceProfile, 0);
+                    break;
+                case 1:
+                    $this->RegisterVariableInteger('Status', 'Status', $referenceProfile, 0);
+                    break;
+                case 2:
+                    $this->RegisterVariableFloat('Status', 'Status', $referenceProfile, 0);
+                    break;
+                case 3:
+                    $this->RegisterVariableString('Status', 'Status', $referenceProfile, 0);
+                    break;
+            }
+            $this->EnableAction('Status');
 
             //Have action
             foreach ($variables as $variable) {
@@ -157,27 +163,9 @@ declare(strict_types=1);
             return 102;
         }
 
-        private function registerStatusVariable($type, $profile)
-        {
-            switch ($type) {
-                case 0:
-                    $this->RegisterVariableBoolean('Status', 'Status', $profile, 0);
-                    break;
-                case 1:
-                    $this->RegisterVariableInteger('Status', 'Status', $profile, 0);
-                    break;
-                case 2:
-                    $this->RegisterVariableFloat('Status', 'Status', $profile, 0);
-                    break;
-                case 3:
-                    $this->RegisterVariableString('Status', 'Status', $profile, 0);
-                    break;
-            }
-        }
-
         private function SwitchGroup($value)
         {
-            $instanceStatus = $this->setCurrentStatus();
+            $instanceStatus = $this->initializeStatus();
             if (($instanceStatus == 102) && ($value != $this->GetValue('Status'))) {
                 $this->SetValue('Status', $value);
                 $variables = json_decode($this->ReadPropertyString('Variables'), true);
