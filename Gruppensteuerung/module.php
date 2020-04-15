@@ -136,16 +136,19 @@ declare(strict_types=1);
             //Update profile of status if necessary
             switch ($referenceType) {
                 case 0:
-                    $this->RegisterVariableBoolean('Status', 'Status', $referenceProfile, 0);
+                    $this->RegisterVariableBoolean('Status', $this->Translate('Status'), $referenceProfile, 0);
                     break;
+
                 case 1:
-                    $this->RegisterVariableInteger('Status', 'Status', $referenceProfile, 0);
+                    $this->RegisterVariableInteger('Status', $this->Translate('Status'), $referenceProfile, 0);
                     break;
+
                 case 2:
-                    $this->RegisterVariableFloat('Status', 'Status', $referenceProfile, 0);
+                    $this->RegisterVariableFloat('Status', $this->Translate('Status'), $referenceProfile, 0);
                     break;
+
                 case 3:
-                    $this->RegisterVariableString('Status', 'Status', $referenceProfile, 0);
+                    $this->RegisterVariableString('Status', $this->Translate('Status'), $referenceProfile, 0);
                     break;
             }
             $this->EnableAction('Status');
