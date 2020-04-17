@@ -36,8 +36,9 @@ declare(strict_types=1);
                 $this->RegisterReference($variable['VariableID']);
             }
 
-            $status = $this->initializeStatus();
-            if ($status != 102) {
+            $this->setUpModule();
+
+            if ($this->GetStatus() != 102) {
                 return;
             }
 
@@ -83,12 +84,12 @@ declare(strict_types=1);
             return IPS_GetVariable($variableID)['VariableType'];
         }
 
-        private function initializeStatus()
+        private function setUpModule()
         {
             //Active
             if (!$this->ReadPropertyBoolean('Active')) {
                 $this->SetStatus(104);
-                return 104;
+                return;
             }
 
             $variables = json_decode($this->ReadPropertyString('Variables'), true);
@@ -96,14 +97,14 @@ declare(strict_types=1);
             //List empty
             if (count($variables) <= 0) {
                 $this->SetStatus(204);
-                return 204;
+                return;
             }
 
             //Exist
             foreach ($variables as $variable) {
                 if (!IPS_VariableExists($variable['VariableID'])) {
                     $this->SetStatus(203);
-                    return 203;
+                    return;
                 }
             }
             //ReferenceVariable
@@ -115,7 +116,7 @@ declare(strict_types=1);
             foreach ($variables as $variable) {
                 if ($this->getType($variable['VariableID']) != $referenceType) {
                     $this->SetStatus(200);
-                    return 200;
+                    return;
                 }
             }
 
@@ -123,7 +124,7 @@ declare(strict_types=1);
             foreach ($variables as $variable) {
                 if ($this->getProfile($variable['VariableID']) != $referenceProfile) {
                     $this->SetStatus(201);
-                    return 201;
+                    return;
                 }
             }
 
@@ -157,18 +158,19 @@ declare(strict_types=1);
             foreach ($variables as $variable) {
                 if (!HasAction($variable['VariableID'])) {
                     $this->SetStatus(202);
-                    return 202;
+                    return;
                 }
             }
 
             //Everything ok
             $this->SetStatus(102);
-            return 102;
+            return;
         }
 
         private function SwitchGroup($value)
         {
-            $instanceStatus = $this->initializeStatus();
+            $this->setUpModule();
+            $instanceStatus = $this->GetStatus();
             if (($instanceStatus == 102) && ($value != $this->GetValue('Status'))) {
                 $this->SetValue('Status', $value);
                 $variables = json_decode($this->ReadPropertyString('Variables'), true);
