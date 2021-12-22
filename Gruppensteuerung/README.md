@@ -16,7 +16,7 @@ Mithilfe der Gruppensteuerungen können Variablen in Gruppen zusammen geschaltet
 * Wenn eine Variable in der Gruppe geschaltet wird, werden alle verbleibenden in der Gruppe ebenso geschaltet
 * Alle Variablen, welche einer Liste hinzugefügt werden können mit einer seperaten Variable gleichzeitig geschlatet werden
 
-### 2. Vorraussetzungen
+### 2. Voraussetzungen
 
 - IP-Symcon ab Version 5.0
 
