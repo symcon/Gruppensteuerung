@@ -6,5 +6,5 @@
 
 Folgende Module beinhaltet das Gruppensteuerung Repository:
 
-- __Gruppensteuerung__ ([Dokumentation](Gruppensteuerung))  
+- __Gruppensteuerung__ ([Dokumentation](https://www.symcon.de/de/service/dokumentation/modulreferenz/gruppensteuerung))  
 	Mithilfe der Gruppensteuerungen können Variablen in Gruppen zusammen geschaltet werden.
