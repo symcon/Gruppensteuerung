@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-class Gruppensteuerung extends IPSModule
+class GroupControl extends IPSModule
 {
     public function Create()
     {

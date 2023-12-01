@@ -11,8 +11,8 @@ class GruppensteuerungValidationTest extends TestCaseSymconValidation
         $this->validateLibrary(__DIR__ . '/..');
     }
 
-    public function testValidateGruppensteuerungModule(): void
+    public function testValidateGroupControlModule(): void
     {
-        $this->validateModule(__DIR__ . '/../Gruppensteuerung');
+        $this->validateModule(__DIR__ . '/../GroupControl');
     }
 }

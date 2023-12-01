@@ -1,6 +1,6 @@
 {
     "id": "{F197064F-791F-0964-2B8E-563136E9B7B4}",
-    "name": "Gruppensteuerung",
+    "name": "Group Control",
     "type": 3,
     "vendor": "",
     "aliases": [],
@@ -8,5 +8,5 @@
     "childRequirements": [],
     "implemented": [],
     "prefix": "GS",
-    "url": "https://github.com/symcon/Gruppensteuerung"
+    "url": "https://www.symcon.de/en/service/documentation/module-reference/group-control/"
 }

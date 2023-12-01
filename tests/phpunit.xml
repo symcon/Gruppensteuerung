@@ -6,7 +6,7 @@
   </php>
   <source>
     <include>
-      <directory suffix=".php">../Gruppensteuerung</directory>
+      <directory suffix=".php">../GroupControl</directory>
     </include>
   </source>
 </phpunit>
