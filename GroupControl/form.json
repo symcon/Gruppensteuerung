@@ -6,6 +6,12 @@
             "name": "Active"
         },
         {
+          "type": "NumberSpinner",
+          "caption": "Debounce Delay",
+          "name": "DebounceDelay",
+          "suffix": "milliseconds"
+        },
+        {
             "type": "List",
             "caption": "Variables",
             "name": "Variables",

@@ -11,7 +11,9 @@
             "Not all variables have an action.": "Nicht alle Variablen haben eine Aktion.",
             "Not all variables exist.": "Nicht alle Variablen existieren",
             "https://www.symcon.de/en/service/documentation/module-reference/group-control/": "https://www.symcon.de/de/service/dokumentation/modulreferenz/gruppensteuerung/",
-            "Group Control": "Gruppensteuerung"
+            "Group Control": "Gruppensteuerung",
+            "milliseconds": "Millisekunden",
+            "Debounce Delay": "Entprellzeit"
         }
     }
 }

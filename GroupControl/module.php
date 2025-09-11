@@ -12,6 +12,7 @@ class GroupControl extends IPSModule
         //Properties
         $this->RegisterPropertyBoolean('Active', false);
         $this->RegisterPropertyString('Variables', '[]');
+        $this->RegisterPropertyInteger('DebounceDelay', 200);
     }
 
     public function Destroy()
@@ -38,7 +39,7 @@ class GroupControl extends IPSModule
 
         $this->setUpModule();
 
-        if ($this->GetStatus() != 102) {
+        if ($this->GetStatus() != IS_ACTIVE) {
             return;
         }
 
@@ -54,8 +55,11 @@ class GroupControl extends IPSModule
 
     public function MessageSink($Timestamp, $SenderID, $MessageID, $Data)
     {
-        $this->SendDebug('MessageSink', IPS_GetName($SenderID), 0);
-        $this->RequestAction('Status', $Data[0]);
+        if (IPS_SemaphoreEnter("SwitchGroup", 10)) {
+            $this->SendDebug('MessageSink', IPS_GetName($SenderID), 0);
+            $this->RequestAction('Status', $Data[0]);
+            IPS_SemaphoreLeave("SwitchGroup");
+        }
     }
 
     public function RequestAction($Ident, $Value)
@@ -88,7 +92,7 @@ class GroupControl extends IPSModule
     {
         //Active
         if (!$this->ReadPropertyBoolean('Active')) {
-            $this->SetStatus(104);
+            $this->SetStatus(IS_INACTIVE);
             return;
         }
 
@@ -96,14 +100,14 @@ class GroupControl extends IPSModule
 
         //List empty
         if (count($variables) <= 0) {
-            $this->SetStatus(204);
+            $this->SetStatus(IS_EBASE + 4);
             return;
         }
 
         //Exist
         foreach ($variables as $variable) {
             if (!IPS_VariableExists($variable['VariableID'])) {
-                $this->SetStatus(203);
+                $this->SetStatus(IS_EBASE + 3);
                 return;
             }
         }
@@ -115,7 +119,7 @@ class GroupControl extends IPSModule
         //Same type
         foreach ($variables as $variable) {
             if ($this->getType($variable['VariableID']) != $referenceType) {
-                $this->SetStatus(200);
+                $this->SetStatus(IS_EBASE);
                 return;
             }
         }
@@ -123,7 +127,7 @@ class GroupControl extends IPSModule
         //Same profile
         foreach ($variables as $variable) {
             if ($this->getProfile($variable['VariableID']) != $referenceProfile) {
-                $this->SetStatus(201);
+                $this->SetStatus(IS_EBASE + 1);
                 return;
             }
         }
@@ -157,38 +161,41 @@ class GroupControl extends IPSModule
         //Have action
         foreach ($variables as $variable) {
             if (!HasAction($variable['VariableID'])) {
-                $this->SetStatus(202);
+                $this->SetStatus(IS_EBASE + 2);
                 return;
             }
         }
 
         //Everything ok
-        $this->SetStatus(102);
-        return;
+        $this->SetStatus(IS_ACTIVE);
     }
 
     private function SwitchGroup($value)
     {
-        $this->setUpModule();
-        $instanceStatus = $this->GetStatus();
-        if (($instanceStatus == 102) && ($value != $this->GetValue('Status'))) {
-            $this->SetValue('Status', $value);
-            $variables = json_decode($this->ReadPropertyString('Variables'), true);
+        if (IPS_SemaphoreEnter("SwitchGroup", 10)) {
+            $this->setUpModule();
+            $instanceStatus = $this->GetStatus();
+            if (($instanceStatus == IS_ACTIVE) && ($value != $this->GetValue('Status'))) {
+                $this->SetValue('Status', $value);
+                $variables = json_decode($this->ReadPropertyString('Variables'), true);
 
-            foreach ($variables as $variable) {
-                if (GetValue($variable['VariableID']) != $value && HasAction($variable['VariableID'])) {
-                    RequestAction($variable['VariableID'], $value);
-                } elseif (!HasAction($variable['VariableID'])) {
-                    throw new Exception('One variable has no action.');
+                foreach ($variables as $variable) {
+                    if (GetValue($variable['VariableID']) != $value && HasAction($variable['VariableID'])) {
+                        RequestAction($variable['VariableID'], $value);
+                    } elseif (!HasAction($variable['VariableID'])) {
+                        throw new Exception('One variable has no action.');
+                    }
                 }
+            } elseif ($instanceStatus != IS_ACTIVE) {
+                $statuscodes = [];
+                $statusForm = json_decode(IPS_GetConfigurationForm($this->InstanceID), true)['status'];
+                foreach ($statusForm as $status) {
+                    $statuscodes[$status['code']] = $status['caption'];
+                }
+                $this->LogMessage($this->Translate($statuscodes[$instanceStatus]), KL_ERROR);
             }
-        } elseif ($instanceStatus != 102) {
-            $statuscodes = [];
-            $statusForm = json_decode(IPS_GetConfigurationForm($this->InstanceID), true)['status'];
-            foreach ($statusForm as $status) {
-                $statuscodes[$status['code']] = $status['caption'];
-            }
-            $this->LogMessage($this->Translate($statuscodes[$instanceStatus]), KL_ERROR);
+            IPS_Sleep($this->ReadPropertyInteger("DebounceDelay"));
+            IPS_SemaphoreLeave("SwitchGroup");
         }
     }
 }
