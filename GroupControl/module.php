@@ -55,11 +55,8 @@ class GroupControl extends IPSModule
 
     public function MessageSink($Timestamp, $SenderID, $MessageID, $Data)
     {
-        if (IPS_SemaphoreEnter("SwitchGroup", 10)) {
-            $this->SendDebug('MessageSink', IPS_GetName($SenderID), 0);
-            $this->RequestAction('Status', $Data[0]);
-            IPS_SemaphoreLeave("SwitchGroup");
-        }
+        $this->SendDebug('MessageSink', IPS_GetName($SenderID) . " = " . $Data[0], 0);
+        $this->SwitchGroup($Data[0]);
     }
 
     public function RequestAction($Ident, $Value)
