@@ -16,6 +16,7 @@
             "caption": "Variables",
             "name": "Variables",
             "add": true,
+            "multiAdd": true,
             "delete": true,
             "columns": [
                 {
