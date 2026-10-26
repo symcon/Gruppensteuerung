@@ -169,30 +169,38 @@ class GroupControl extends IPSModule
 
     private function SwitchGroup($value)
     {
-        if (IPS_SemaphoreEnter("SwitchGroup", 10)) {
-            $this->setUpModule();
-            $instanceStatus = $this->GetStatus();
-            if (($instanceStatus == IS_ACTIVE) && ($value != $this->GetValue('Status'))) {
-                $this->SetValue('Status', $value);
-                $variables = json_decode($this->ReadPropertyString('Variables'), true);
+        if (IPS_SemaphoreEnter("SwitchGroup" . $this->InstanceID, 10)) {
+            try {
+                $this->setUpModule();
+                $instanceStatus = $this->GetStatus();
+                if (($instanceStatus == IS_ACTIVE) && ($value != $this->GetValue('Status'))) {
+                    $variables = json_decode($this->ReadPropertyString('Variables'), true);
 
-                foreach ($variables as $variable) {
-                    if (GetValue($variable['VariableID']) != $value && HasAction($variable['VariableID'])) {
-                        RequestAction($variable['VariableID'], $value);
-                    } elseif (!HasAction($variable['VariableID'])) {
-                        throw new Exception('One variable has no action.');
+                    // Validate all variables first so the group is never left half switched
+                    foreach ($variables as $variable) {
+                        if (!HasAction($variable['VariableID'])) {
+                            throw new Exception('One variable has no action.');
+                        }
                     }
+
+                    $this->SetValue('Status', $value);
+                    foreach ($variables as $variable) {
+                        if (GetValue($variable['VariableID']) != $value) {
+                            RequestAction($variable['VariableID'], $value);
+                        }
+                    }
+                } elseif ($instanceStatus != IS_ACTIVE) {
+                    $statuscodes = [];
+                    $statusForm = json_decode(IPS_GetConfigurationForm($this->InstanceID), true)['status'];
+                    foreach ($statusForm as $status) {
+                        $statuscodes[$status['code']] = $status['caption'];
+                    }
+                    $this->LogMessage($this->Translate($statuscodes[$instanceStatus]), KL_ERROR);
                 }
-            } elseif ($instanceStatus != IS_ACTIVE) {
-                $statuscodes = [];
-                $statusForm = json_decode(IPS_GetConfigurationForm($this->InstanceID), true)['status'];
-                foreach ($statusForm as $status) {
-                    $statuscodes[$status['code']] = $status['caption'];
-                }
-                $this->LogMessage($this->Translate($statuscodes[$instanceStatus]), KL_ERROR);
+                IPS_Sleep($this->ReadPropertyInteger("DebounceDelay"));
+            } finally {
+                IPS_SemaphoreLeave("SwitchGroup" . $this->InstanceID);
             }
-            IPS_Sleep($this->ReadPropertyInteger("DebounceDelay"));
-            IPS_SemaphoreLeave("SwitchGroup");
         }
     }
 }
